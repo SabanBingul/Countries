@@ -5,10 +5,24 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.TextView
+import androidx.lifecycle.Observer
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.ViewModelProvider
 import com.sabanbingul.kotlincountries.R
+import com.sabanbingul.kotlincountries.viewmodel.CountryViewModel
+import com.sabanbingul.kotlincountries.viewmodel.FeedViewModel
 
 
 class CountryFragment : Fragment() {
+
+    private lateinit var viewModel: CountryViewModel
+
+    private lateinit var countryName : TextView
+    private lateinit var countryRegion : TextView
+    private lateinit var countryCapital : TextView
+    private lateinit var countryCurrency : TextView
+    private lateinit var countryLanguage : TextView
 
     private var countryUuid = 0
 
@@ -28,10 +42,37 @@ class CountryFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+        countryName = view.findViewById(R.id.countryName)
+        countryRegion = view.findViewById(R.id.countryRegion)
+        countryCapital = view.findViewById(R.id.countryCapital)
+        countryCurrency = view.findViewById(R.id.countryCurrency)
+        countryLanguage = view.findViewById(R.id.countryLanguage)
+
+
+        viewModel = ViewModelProvider(this).get(CountryViewModel::class.java)
+        viewModel.getDataFromRoom()
+
+
+
         arguments?.let {
             countryUuid = CountryFragmentArgs.fromBundle(it).countryUuid
         }
 
+        observeLiveData()
+
+    }
+
+    private fun observeLiveData(){
+        viewModel.countryLiveData.observe(viewLifecycleOwner, Observer { country ->
+            country?.let {
+                countryName.text = country.countryName
+                countryCapital.text = country.countryCapital
+                countryRegion.text = country.countryRegion
+                countryCurrency.text = country.countryCurrency
+                countryLanguage.text = country.countryLanguage
+            }
+
+        })
     }
 
 }
